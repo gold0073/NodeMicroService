@@ -1,6 +1,6 @@
 'use strict'
 
-const business = require('../business/bs_goods');
+const business = require('../model/bs_goods');
 const serverjs = require('../server.js');
 
 class goods extends serverjs{

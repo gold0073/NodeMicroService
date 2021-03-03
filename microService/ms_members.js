@@ -4,7 +4,7 @@
 const serverjs = require('../server.js');
 
 // 비즈니스로직 파일 참조
-const business = require('../business/bs_members.js');
+const business = require('../model/bs_members.js');
 
 // Server클래스 참조
 class members extends serverjs{
