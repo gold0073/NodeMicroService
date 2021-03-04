@@ -38,15 +38,21 @@ function register(method, pathname, params, cb) {
         errormessage: "success"
     };
 
-    if (params.name == null || params.category == null || params.price == null || params.description == null) {
+    console.log("aaaaaaaaaaa");
+    console.log(method);
+    console.log(pathname);
+    console.log(params.user_id);
+    console.log(params.title);
+
+    if (params.user_id == null || params.title == null || params.context == null) {
         response.errorcode = 1;
         response.errormessage = "Invalid Parameters";
         cb(response);
     } else {
         var connection = mysql.createConnection(conn);
         connection.connect();
-        connection.query("insert into goods(name, category, price, description) values(? ,? ,? ,?)"
-            , [params.name, params.category, params.price, params.description]
+        connection.query("insert into CONTENT (content_id, user_id, title, context ) values(null ,? ,? ,?,now())"
+            , [params.user_id, params.title, params.context]
             , (error, results, fields) => {
             if (error) {
                 response.errorcode = 1;

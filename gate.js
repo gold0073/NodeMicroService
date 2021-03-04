@@ -4,7 +4,7 @@ const http = require('http');
 const url = require('url');
 const querystring = require('querystring');
 const tcpClient = require('./client');
-const cors = require("@koa/cors");
+const cors = require("cors");
 
 var mapClients = {};
 var mapUrls = {};
@@ -18,14 +18,19 @@ var server = http.createServer((req, res) => {
     var uri = url.parse(req.url, true);
     var pathname = uri.pathname;
 
+    console.log('server created');
+
     //CORS  오류 해결 ////////////////////////////////////////////////////////////////////////////
     //vuejs as been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. 
     res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Max-Age", "1800");
-    res.setHeader("Access-Control-Allow-Headers", "content-type");
     res.setHeader("Access-Control-Allow-Methods","PUT, POST, GET, DELETE, PATCH, OPTIONS");
+    
     /////////////////////////////////////////////////////////////////////////////////////////////
+
+    console.log('method' , method);
 
     if (method === "POST" || method === "PUT") {
         var body = "";
@@ -142,7 +147,7 @@ function onCreateClient(options) {
 // 마이크로서비스 응답 처리
 function onReadClient(options, packet) {
     console.log("onReadClient", packet);
-    mapResponse[packet.key].writeHead(200, { 'Content-Type': 'application/json' });
+    mapResponse[packet.key].writeHead(200, { 'Content-Type': 'application/www-form-urlencoded' });
     mapResponse[packet.key].end(JSON.stringify(packet));
     delete mapResponse[packet.key];                         // http 응답객체 삭제
 }
