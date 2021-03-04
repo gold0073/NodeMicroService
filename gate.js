@@ -1,10 +1,15 @@
 
 'use strict'
+const express = require('express');
 const http = require('http');
 const url = require('url');
 const querystring = require('querystring');
 const tcpClient = require('./client');
 const cors = require("cors");
+
+//var app = express();
+//app.use(cors);
+
 
 var mapClients = {};
 var mapUrls = {};
@@ -27,12 +32,10 @@ var server = http.createServer((req, res) => {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Max-Age", "1800");
     res.setHeader("Access-Control-Allow-Methods","PUT, POST, GET, DELETE, PATCH, OPTIONS");
-    
-    /////////////////////////////////////////////////////////////////////////////////////////////
 
     console.log('method' , method);
 
-    if (method === "POST" || method === "PUT") {
+    if (method === "POST" || method === "PUT" || method === "OPTIONS") {
         var body = "";
 
         req.on('data', function (data) {
@@ -54,8 +57,8 @@ var server = http.createServer((req, res) => {
 }).listen(8000, () => {
     console.log('listen', server.address());
 
-// Distributor와 의 통신 처리
-var packet = {
+    // Distributor와 의 통신 처리
+    var packet = {
         uri: "/distributes",
         method: "POST",
         key: 0,
@@ -65,7 +68,7 @@ var packet = {
             urls: []
         }
     };
-    var isConnectedDistributor = false;
+    var isConnectedDistributor = false;       
 
     this.clientDistributor = new tcpClient(
         "127.0.0.1"
@@ -91,13 +94,20 @@ var packet = {
 
 // API 호출 처리
 function onRequest(res, method, pathname, params) {
+
+    
     var key = method + pathname;
+
+    console.log(key);
+
     var client = mapUrls[key];
     if (client == null) {
         res.writeHead(404);
         res.end();
+        console.log("client null");
         return;
     } else {
+        console.log("Api 호출 고유키 설정");
         params.key = index;                             // API호출에 대한 고유 키값 설정
         var packet = {
             uri: pathname,
@@ -147,7 +157,11 @@ function onCreateClient(options) {
 // 마이크로서비스 응답 처리
 function onReadClient(options, packet) {
     console.log("onReadClient", packet);
-    mapResponse[packet.key].writeHead(200, { 'Content-Type': 'application/www-form-urlencoded' });
+    mapResponse[packet.key].writeHead(200, { 
+        //'Content-Type': 'application/www-form-urlencoded'
+        'Content-Type': 'application/json'
+    });
+
     mapResponse[packet.key].end(JSON.stringify(packet));
     delete mapResponse[packet.key];                         // http 응답객체 삭제
 }
