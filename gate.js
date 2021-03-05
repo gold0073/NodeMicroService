@@ -7,10 +7,6 @@ const querystring = require('querystring');
 const tcpClient = require('./client');
 const cors = require("cors");
 
-//var app = express();
-//app.use(cors);
-
-
 var mapClients = {};
 var mapUrls = {};
 var mapResponse = {};
@@ -23,7 +19,7 @@ var server = http.createServer((req, res) => {
     var uri = url.parse(req.url, true);
     var pathname = uri.pathname;
 
-    console.log('server created');
+    console.log('server created req.method ==>', req.method);
 
     //CORS  오류 해결 ////////////////////////////////////////////////////////////////////////////
     //vuejs as been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. 
@@ -33,9 +29,9 @@ var server = http.createServer((req, res) => {
     res.setHeader("Access-Control-Max-Age", "1800");
     res.setHeader("Access-Control-Allow-Methods","PUT, POST, GET, DELETE, PATCH, OPTIONS");
 
-    console.log('method' , method);
+    console.log('gate method=>' , method);
 
-    if (method === "POST" || method === "PUT" || method === "OPTIONS") {
+    if (method === "POST" || method === "PUT" ) {
         var body = "";
 
         req.on('data', function (data) {

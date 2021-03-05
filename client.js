@@ -64,4 +64,4 @@ class tcpClient {
     }
 }
 
-module.exports = tcpClient;
+module.exports = tcpClient

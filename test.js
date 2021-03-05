@@ -85,9 +85,9 @@ function members(callback) {
         options.method = "POST";
         options.path = "/members";
         request(cb, {
-            username: "test_account",
-            password: "1234",
-            passwordConfirm: "1234"
+            username: "test_account_2",
+            password: "12345",
+            passwordConfirm: "12345"
         });
     }
 
@@ -120,7 +120,7 @@ function purchases(callback) {
         options.path = "/purchases";        
         request(cb, {
             userid: 1,
-            goodsid: 1
+            goodsid: 2
         });
     }
 
