@@ -4,15 +4,15 @@
 const serverjs = require('../server.js');
 
 // 비즈니스로직 파일 참조
-const business = require('../model/bs_contents.js');
+const business = require('../model/pgdb_contents.js');
 
 // Server클래스 참조
-class contents extends serverjs{
+class postgreDb_contents extends serverjs{
     constructor() {
         
-        super("contents"                                                     // 부cd..모 클래스 생성자 호출
-            , process.argv[2] ? Number(process.argv[2]) : 9040
-            , ["POST/contents", "GET/contents", "DELETE/contents"]
+        super("postgreDb_contents"                                                     // 부cd..모 클래스 생성자 호출
+            , process.argv[2] ? Number(process.argv[2]) : 9050
+            , ["POST/pgdb_contents", "GET/pgdb_contents", "DELETE/pgdb_contents"]
         );
 
         this.connectToDistributor("127.0.0.1", 9000, (data) => {            // Distributor 연결
@@ -32,4 +32,4 @@ class contents extends serverjs{
     }
 }
 
-new contents();                                                              // 인스턴스 생성
+new postgreDb_contents();                                                              // 인스턴스 생성

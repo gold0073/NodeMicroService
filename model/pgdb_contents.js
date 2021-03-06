@@ -1,11 +1,13 @@
 
-const mysql = require('mysql');
-const conn = {
+/*   PostgresDB  */
+const {Pool} = require('pg');
+const pool =new Pool({
     host: 'localhost',
-    user: 'micro',
-    password: 'service',
-    database: 'monolithic'
-};
+    user: 'postgres',
+    password: 'park0070!',
+    database: 'monolithic',
+    port : '5432'
+});
 
 /**
  * Content 기능별로 분기
@@ -28,10 +30,12 @@ exports.onRequest = function (res, method, pathname, params, cb) {
                     return fn_content_delete(method, pathname, params, (response) => { process.nextTick(cb, res, response); });
                 case "comment_create":
                     return fn_comment_create(method, pathname, params, (response) => { process.nextTick(cb, res, response); });
-                case "ccomment_update":
+                case "sub_comment_create":
+                    return fn_sub_comment_create(method, pathname, params, (response) => { process.nextTick(cb, res, response); });
+                case "comment_update":
                     return fn_comment_update(method, pathname, params, (response) => { process.nextTick(cb, res, response); });    
-                case "comment_delete":
-                    return fn_comment_delete(method, pathname, params, (response) => { process.nextTick(cb, res, response); });    
+                //case "comment_delete":
+                //    return fn_comment_delete(method, pathname, params, (response) => { process.nextTick(cb, res, response); });    
                 default:
             }
         case "PUT":  
@@ -42,6 +46,8 @@ exports.onRequest = function (res, method, pathname, params, cb) {
                     return fn_content_inquiry(method, pathname, params, (response) => { process.nextTick(cb, res, response); });
                 case "comment_inquery":
                     return fn_comment_inquiry(method, pathname, params, (response) => { process.nextTick(cb, res, response); });    
+                case "sub_comment_inquery":
+                    return fn_sub_comment_inquiry(method, pathname, params, (response) => { process.nextTick(cb, res, response); });        
                 default:
             }    
         case "DELETE":
@@ -59,6 +65,8 @@ exports.onRequest = function (res, method, pathname, params, cb) {
  * @param cb        콜백
  */
 function fn_content_create(method, pathname, params, cb) {
+  
+
     var response = {
         key: params.key,
         errorcode: 0,
@@ -72,22 +80,24 @@ function fn_content_create(method, pathname, params, cb) {
         response.errormessage = "Invalid Parameters";
         cb(response);
     } else {
-        var connection = mysql.createConnection(conn);
-        connection.connect();
 
-        //신규작성
-        var squery = " INSERT INTO CONTENT values (null,?, ?, ?,now(),null)";
-        connection.query(squery , [params.user_id, params.title, params.context]
-        , (error, results, fields) => {
+        var pg_query = 
+        ` INSERT INTO CONTENT
+        (user_id,title,context,created_at,update_at)
+        values ($1, $2, $3,now(),null)`;
+        console.log("Query ==>" , pg_query);
+
+        pool.query(pg_query , [params.user_id, params.title, params.context]
+        , (error, results) => {
         if (error) {
-            response.errorcode = 1;
-            response.errormessage = error;               
+                console.log("Error ===>",error);
             }
+            console.log("Create Sucess");
             cb(response);
-        });
+        });          
 
-        connection.end();
     }
+
 }
 
 
@@ -112,13 +122,13 @@ function fn_content_update(method, pathname, params, cb) {
         response.errormessage = "Invalid Parameters";
         cb(response);
     } else {
-        var connection = mysql.createConnection(conn);
-        connection.connect();
-
+        
          //업데이트
-         var squery = " UPDATE CONTENT SET title = ?, context = ? WHERE content_id = ?;";
-         connection.query(squery , [params.title, params.context, params.content_id]
-         , (error, results, fields) => {
+         var pg_query = " UPDATE CONTENT SET title = $1, context = $2 WHERE content_id = $3;";
+         console.log("Query ==>" , pg_query);
+
+         pool.query(pg_query , [params.title, params.context, params.content_id]
+         , (error, results) => {
          if (error) {
              response.errorcode = 1;
              response.errormessage = error;               
@@ -126,7 +136,6 @@ function fn_content_update(method, pathname, params, cb) {
              cb(response);    
          });
 
-        connection.end();
     }
 }
 
@@ -145,43 +154,48 @@ function fn_content_inquiry(method, pathname, params, cb) {
         errormessage: "success"
     };
 
-    var connection = mysql.createConnection(conn);
-    connection.connect();
-
     console.log("content_id ==>",params.content_id);
 
     //전체리스트
     if (params.content_id ==null)
     {
-        var squery = " SELECT * FROM CONTENT CT INNER JOIN USER U on U.user_id = CT.user_id ORDER BY CT.created_at DESC";
+        const pg_query = 
+        ` SELECT * FROM CONTENT CT 
+          INNER JOIN USERS U on U.user_id = CT.user_id 
+          ORDER BY CT.created_at DESC
+        `;
+        console.log("Query ==>",pg_query);
 
-        console.log("Query ==>",squery);
-
-        connection.query(squery, (error, results, fields) => {
-            if (error || results.length == 0) {
+        pool.query(pg_query, (error, results) => {
+            if (error || results.rowCount == 0) {
                 response.errorcode = 1;
                 response.errormessage = error ? error : "no data";
+                console.log("Data ===>","No data");
             } else {
-                response.results = results;
+                response.results = results.rows;
             }
             cb(response);
         });
     }else{          //상세 뷰
-        var squery = " SELECT * FROM CONTENT CT INNER JOIN USER U on U.user_id = CT.user_id WHERE CT.content_id = ?";
-        console.log("Query ==>",squery);
+        var pg_query = 
+        ` SELECT * FROM CONTENT CT 
+        INNER JOIN USERS U on U.user_id = CT.user_id 
+        WHERE CT.content_id = $1`;
+        console.log("Query ==>",pg_query);
 
-        connection.query(squery,[params.content_id] ,(error, results, fields) => {
-            if (error || results.length == 0) {
+        pool.query(pg_query,[params.content_id] ,(error, results) => {
+            if (error || results.rowCount == 0) {
                 response.errorcode = 1;
                 response.errormessage = error ? error : "no data";
+                console.log("Data ===>","No data");
             } else {
-                response.results = results;
+                response.results = results.rows;
             }
             cb(response);
         });
     }
     
-    connection.end();
+    
     
 }
 
@@ -204,18 +218,20 @@ function fn_content_delete(method, pathname, params, cb) {
         response.errormessage = "Invalid Parameters";
         cb(response);
     } else {
-        var connection = mysql.createConnection(conn);
-        connection.connect();
-        connection.query("delete from content where content_id = ?"
+
+        const pg_query = `delete from content where content_id = $1`;
+        console.log("Query ==>" , pg_query);
+
+        pool.query(pg_query
             , [params.content_id]
-            , (error, results, fields) => {
+            , (error, results) => {
                 if (error) {
                     response.errorcode = 1;
                     response.errormessage = error;
                 }
                 cb(response);
         });
-        connection.end();
+        
     }
 }
 
@@ -236,18 +252,23 @@ function fn_comment_create(method, pathname, params, cb) {
 
     console.log("register method =>",method);
 
-    if ( params.title == null || params.context == null) {
+    if ( params.content_id == null || params.context == null) {
         response.errorcode = 1;
         response.errormessage = "Invalid Parameters";
         cb(response);
     } else {
-        var connection = mysql.createConnection(conn);
-        connection.connect();
+        
+        
 
         //신규작성
-        var squery = " INSERT INTO CONTENT values (null,?, ?, ?,now(),null)";
-        connection.query(squery , [params.user_id, params.title, params.context]
-        , (error, results, fields) => {
+        var pg_query = 
+        ` INSERT INTO COMMENT
+           ( user_id, content_id, context, created_at, updated_at) 
+            values ($1, $2, $3 ,now(),null)`;
+        console.log("Query ==>" , pg_query);
+
+        pool.query(pg_query , [params.user_id, params.content_id, params.context]
+        , (error, results) => {
         if (error) {
             response.errorcode = 1;
             response.errormessage = error;               
@@ -255,7 +276,44 @@ function fn_comment_create(method, pathname, params, cb) {
             cb(response);
         });
 
-        connection.end();
+        
+    }
+}
+
+function fn_sub_comment_create(method, pathname, params, cb) {
+    var response = {
+        key: params.key,
+        errorcode: 0,
+        errormessage: "success"
+    };
+
+    console.log("register method =>",method);
+
+    if ( params.comment_id == null || params.context == null) {
+        response.errorcode = 1;
+        response.errormessage = "Invalid Parameters";
+        cb(response);
+    } else {
+        
+        
+
+        //신규작성
+        var pg_query = 
+        ` INSERT INTO SUB_COMMENT 
+            (user_id, comment_id, context, created_at, updated_at)
+            values ($1, $2, $3, now(), null) `;
+        console.log("Query ==>" , pg_query);
+
+        pool.query(pg_query , [params.user_id, params.comment_id, params.context]
+        , (error, results) => {
+        if (error) {
+            response.errorcode = 1;
+            response.errormessage = error;               
+            }
+            cb(response);
+        });
+
+        
     }
 }
 
@@ -281,13 +339,15 @@ function fn_comment_update(method, pathname, params, cb) {
         response.errormessage = "Invalid Parameters";
         cb(response);
     } else {
-        var connection = mysql.createConnection(conn);
-        connection.connect();
+        
+        
 
          //업데이트
-         var squery = " UPDATE CONTENT SET title = ?, context = ? WHERE content_id = ?;";
-         connection.query(squery , [params.title, params.context, params.content_id]
-         , (error, results, fields) => {
+         var pg_query = ` UPDATE CONTENT SET title = $1, context = $2 WHERE content_id = $3;`;
+         console.log("Query ==>" , pg_query);
+
+         pool.query(pg_query , [params.title, params.context, params.content_id]
+         , (error, results) => {
          if (error) {
              response.errorcode = 1;
              response.errormessage = error;               
@@ -295,7 +355,7 @@ function fn_comment_update(method, pathname, params, cb) {
              cb(response);    
          });
 
-        connection.end();
+        
     }
 }
 
@@ -314,43 +374,62 @@ function fn_comment_inquiry(method, pathname, params, cb) {
         errormessage: "success"
     };
 
-    var connection = mysql.createConnection(conn);
-    connection.connect();
+    
+    
 
     console.log("content_id ==>",params.content_id);
 
     //전체리스트
-    if (params.content_id ==null)
-    {
-        var squery = " SELECT * FROM CONTENT CT INNER JOIN USER U on U.user_id = CT.user_id ORDER BY CT.created_at DESC";
+    const pg_query = ` SELECT * FROM COMMENT CM
+        INNER JOIN USERS U on U.user_id = CM.user_id
+        WHERE CM.content_id = $1`;
+    console.log("Query ==>",pg_query);
 
-        console.log("Query ==>",squery);
-
-        connection.query(squery, (error, results, fields) => {
-            if (error || results.length == 0) {
-                response.errorcode = 1;
-                response.errormessage = error ? error : "no data";
-            } else {
-                response.results = results;
-            }
-            cb(response);
-        });
-    }else{          //상세 뷰
-        var squery = " SELECT * FROM CONTENT CT INNER JOIN USER U on U.user_id = CT.user_id WHERE CT.content_id = ?";
-        console.log("Query ==>",squery);
-
-        connection.query(squery,[params.content_id] ,(error, results, fields) => {
-            if (error || results.length == 0) {
-                response.errorcode = 1;
-                response.errormessage = error ? error : "no data";
-            } else {
-                response.results = results;
-            }
-            cb(response);
-        });
-    }
+    pool.query(pg_query,[params.content_id] ,(error, results) => {
+        if (error || results.rowCount == 0) {
+            response.errorcode = 1;
+            response.errormessage = error ? error : "no data";
+            console.log("Data ===>","No data");
+        } else {
+            response.results = results.rows;
+        }
+        cb(response);
+    });
     
-    connection.end();
+    
+    
+}
+
+function fn_sub_comment_inquiry(method, pathname, params, cb) {
+    var response = {
+        key: params.key,
+        errorcode: 0,
+        errormessage: "success"
+    };
+
+    
+    
+
+    console.log("comment_id ==>",params.comment_id);
+
+    //전체리스트
+    const pg_query = `SELECT * FROM SUB_COMMENT SCM
+    INNER JOIN USERS U on U.user_id = SCM.user_id
+    WHERE comment_id = $1`;
+    console.log("Query ==>",pg_query);
+
+    pool.query(pg_query,[params.comment_id] ,(error, results) => {
+        if (error || results.rowCount == 0) {
+            response.errorcode = 1;
+            response.errormessage = error ? error : "no data";
+            console.log("Data ===>","No data");
+        } else {
+            response.results = results.rows;
+        }
+        cb(response);
+    });
+    
+    
     
 }
 
@@ -361,6 +440,7 @@ function fn_comment_inquiry(method, pathname, params, cb) {
  * @param params    입력 파라미터
  * @param cb        콜백
  */
+/*
 function fn_comment_delete(method, pathname, params, cb) {
     var response = {
         key: params.key,
@@ -373,17 +453,18 @@ function fn_comment_delete(method, pathname, params, cb) {
         response.errormessage = "Invalid Parameters";
         cb(response);
     } else {
-        var connection = mysql.createConnection(conn);
-        connection.connect();
-        connection.query("delete from content where content_id = ?"
+        
+        
+        pool.query("delete from content where content_id = $1"
             , [params.content_id]
-            , (error, results, fields) => {
+            , (error, results) => {
                 if (error) {
                     response.errorcode = 1;
                     response.errormessage = error;
                 }
                 cb(response);
         });
-        connection.end();
+        
     }
 }
+*/
