@@ -34,8 +34,10 @@ exports.onRequest = function (res, method, pathname, params, cb) {
                     return fn_sub_comment_create(method, pathname, params, (response) => { process.nextTick(cb, res, response); });
                 case "comment_update":
                     return fn_comment_update(method, pathname, params, (response) => { process.nextTick(cb, res, response); });    
-                //case "comment_delete":
-                //    return fn_comment_delete(method, pathname, params, (response) => { process.nextTick(cb, res, response); });    
+                case "comment_delete":
+                    return fn_comment_delete(method, pathname, params, (response) => { process.nextTick(cb, res, response); });    
+                    case "sub_comment_delete":
+                        return fn_sub_comment_delete(method, pathname, params, (response) => { process.nextTick(cb, res, response); });        
                 default:
             }
         case "PUT":  
@@ -436,7 +438,6 @@ function fn_sub_comment_inquiry(method, pathname, params, cb) {
  * @param params    입력 파라미터
  * @param cb        콜백
  */
-/*
 function fn_comment_delete(method, pathname, params, cb) {
     var response = {
         key: params.key,
@@ -444,15 +445,15 @@ function fn_comment_delete(method, pathname, params, cb) {
         errormessage: "success"
     };
 
-    if (params.content_id == null) {
+    if (params.comment_id == null) {
         response.errorcode = 1;
         response.errormessage = "Invalid Parameters";
         cb(response);
     } else {
         var connection = mysql.createConnection(conn);
         connection.connect();
-        connection.query("delete from content where content_id = ?"
-            , [params.content_id]
+        connection.query("delete from comment where comment_id = ?"
+            , [params.comment_id]
             , (error, results, fields) => {
                 if (error) {
                     response.errorcode = 1;
@@ -463,4 +464,37 @@ function fn_comment_delete(method, pathname, params, cb) {
         connection.end();
     }
 }
-*/
+
+/**
+ * sub_comment 삭제 기능
+ * @param method    메서드
+ * @param pathname  URI
+ * @param params    입력 파라미터
+ * @param cb        콜백
+ */
+function fn_sub_comment_delete(method, pathname, params, cb) {
+    var response = {
+        key: params.key,
+        errorcode: 0,
+        errormessage: "success"
+    };
+
+    if (params.sub_comment_id == null) {
+        response.errorcode = 1;
+        response.errormessage = "Invalid Parameters";
+        cb(response);
+    } else {
+        var connection = mysql.createConnection(conn);
+        connection.connect();
+        connection.query("delete from sub_comment where sub_comment_id = ?"
+            , [params.sub_comment_id]
+            , (error, results, fields) => {
+                if (error) {
+                    response.errorcode = 1;
+                    response.errormessage = error;
+                }
+                cb(response);
+        });
+        connection.end();
+    }
+}
