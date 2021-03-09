@@ -10,7 +10,7 @@ const business = require('../model/mdb_boards.js');
 class mariaDb_boards extends serverjs{
     constructor() {
         
-        super("mariaDb_contents"                                                     // 부cd..모 클래스 생성자 호출
+        super("mariaDb_boards"                                                     // 부cd..모 클래스 생성자 호출
             , process.argv[2] ? Number(process.argv[2]) : 9050
             , ["POST/mdb_boards", "GET/mdb_boards", "DELETE/mdb_boards"]
         );
