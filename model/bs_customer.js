@@ -39,22 +39,42 @@ function register(method, pathname, params, cb) {
         errormessage: "success"
     };
 
-    if (params.username == null || params.password == null) {
-        response.errorcode = 1;
-        response.errormessage = "Invalid Parameters";
+    var connection = mysql.createConnection(conn);
+    connection.connect();
+    connection.query("insert into customer(username, password) values('" + params.username + "',password('" + params.password + "'));", (error, results, fields) => {
+        if (error) {
+            response.errorcode = 1;
+            response.errormessage = error;                
+        }
         cb(response);
-    } else {
-        var connection = mysql.createConnection(conn);
-        connection.connect();
-        connection.query("insert into customer(username, password) values('" + params.username + "',password('" + params.password + "'));", (error, results, fields) => {
-            if (error) {
-                response.errorcode = 1;
-                response.errormessage = error;                
-            }
-            cb(response);
-        });
-        connection.end();
-    }
+    });
+   
+
+    /*
+    let image = '/image/' + params.filename;
+    let name = params.name;
+    let birthday = params.birthday;
+    let gender = params.gender;
+    let job = params.job;
+    
+
+    let sql = 'INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?, now(), 0)';
+    let image = '/image/' + req.file.filename;
+    let name = req.body.name;
+    let birthday = req.body.birthday;
+    let gender = req.body.gender;
+    let job = req.body.job;
+
+    let params = [image, name, birthday, gender, job];
+    connection.query(sql, params,
+        (err, results, fields) => {
+            response.send(results);
+        }
+    )
+    */
+
+    connection.end();
+
 }
 
 /**
