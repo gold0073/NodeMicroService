@@ -9,7 +9,7 @@ const conn = {
 
 
 /**
- *  회원 관리의 각 기능별로 분기
+ *  고객 관리의 각 기능별로 분기
 */
 exports.onRequest = function (res, method, pathname, params, cb) {
 
@@ -26,7 +26,7 @@ exports.onRequest = function (res, method, pathname, params, cb) {
 }
 
 /**
- * 회원 등록 기능
+ * 고객 등록 기능
  * @param method    메서드
  * @param pathname  URI
  * @param params    입력 파라미터
@@ -46,7 +46,7 @@ function register(method, pathname, params, cb) {
     } else {
         var connection = mysql.createConnection(conn);
         connection.connect();
-        connection.query("insert into members(username, password) values('" + params.username + "',password('" + params.password + "'));", (error, results, fields) => {
+        connection.query("insert into customer(username, password) values('" + params.username + "',password('" + params.password + "'));", (error, results, fields) => {
             if (error) {
                 response.errorcode = 1;
                 response.errormessage = error;                
@@ -58,7 +58,7 @@ function register(method, pathname, params, cb) {
 }
 
 /**
- * 회원 인증 기능
+ * 고객 인증 기능
  * @param method    메서드
  * @param pathname  URI
  * @param params    입력 파라미터
@@ -70,30 +70,22 @@ function inquiry(method, pathname, params, cb) {
         errorcode: 0,
         errormessage: "success"
     };
-
-    if (params.username == null || params.password == null) {
-
-        response.errorcode = 1;
-        response.errormessage = "Invalid Parameters";
+    var connection = mysql.createConnection(conn);
+    connection.connect();
+    connection.query("select * from  customer", (error, results, fields) => {
+        if (error || results.length == 0) {
+            response.errorcode = 1;
+            response.errormessage = error ? error : "no data";
+        } else {
+            response.results = results;
+        }
         cb(response);
-    } else {
-        var connection = mysql.createConnection(conn);
-        connection.connect();
-        connection.query("select id from  members where username = '" + params.username + "' and password = password('" + params.password +"');", (error, results, fields) => {
-            if (error || results.length == 0) {
-                response.errorcode = 1;
-                response.errormessage = error ? error : "invalid password";
-            } else {
-                response.userid = results[0].id;
-            }
-            cb(response);
-        });
-        connection.end();
-    }     
+    });
+    connection.end();
 }
 
 /**
- * 회원 탈퇴 기능
+ * 고객 탈퇴 기능
  * @param method    메서드
  * @param pathname  URI
  * @param params    입력 파라미터
@@ -113,7 +105,7 @@ function unregister(method, pathname, params, cb) {
     } else {
         var connection = mysql.createConnection(conn);
         connection.connect();
-        connection.query("delete from  members where username = '" + params.username + "';", (error, results, fields) => {
+        connection.query("delete from  customer where username = '" + params.username + "';", (error, results, fields) => {
             if (error) {
                 response.errorcode = 1;
                 response.errormessage = error;                

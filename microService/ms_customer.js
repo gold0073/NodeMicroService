@@ -4,14 +4,14 @@
 const serverjs = require('../server.js');
 
 // 비즈니스로직 파일 참조
-const business = require('../model/bs_members.js');
+const business = require('../model/bs_customer.js');
 
 // Server클래스 참조
-class members extends serverjs{
+class customer extends serverjs{
     constructor() {
-        super("members"                                                     // 부cd..모 클래스 생성자 호출
+        super("customer"                                                     // 부cd..모 클래스 생성자 호출
             , process.argv[2] ? Number(process.argv[2]) : 9020
-            , ["POST/members", "GET/members", "DELETE/members"]
+            , ["POST/customer", "GET/customer", "DELETE/customer"]
         );
 
         this.connectToDistributor("127.0.0.1", 9000, (data) => {            // Distributor 연결
@@ -28,4 +28,4 @@ class members extends serverjs{
     }
 }
 
-new members();                                                              // 인스턴스 생성
+new customer();                                                              // 인스턴스 생성

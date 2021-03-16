@@ -10,6 +10,8 @@ START "Microservice_boards_comment" node ./microService/ms_mdb_boards_comments.j
 
 START "Microservice_contents" node ./microService/ms_mdb_contents.js
 
+START "customer" node ./microService/ms_customer.js
+
 
 
 
