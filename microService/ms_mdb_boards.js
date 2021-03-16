@@ -11,7 +11,7 @@ class mariaDb_boards extends serverjs{
     constructor() {
         
         super("mariaDb_boards"                                                     // 부cd..모 클래스 생성자 호출
-            , process.argv[2] ? Number(process.argv[2]) : 9050
+            , process.argv[2] ? Number(process.argv[2]) : 9060
             , ["POST/mdb_boards", "GET/mdb_boards", "DELETE/mdb_boards"]
         );
 
