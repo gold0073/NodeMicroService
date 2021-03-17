@@ -36,6 +36,7 @@ exports.onRequest = function (res, method, pathname, params, cb) {
                 case "content_inquery":
                     return fn_content_inquiry(method, pathname, params, (response) => { process.nextTick(cb, res, response); });
                 default:
+                    return fn_content_inquiry(method, pathname, params, (response) => { process.nextTick(cb, res, response); });
             }    
         case "DELETE":
             return fn_content_delete(method, pathname, params, (response) => { process.nextTick(cb, res, response); });
