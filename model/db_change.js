@@ -71,7 +71,7 @@ console.log("Query ==>",m_query);
 
 const response = '';
 
-connection.query(m_query, (error, results, fields) => {;
+connection.query(m_query, (error, results)=> {;
     if (error || results.length == 0) {
         console.log("no data");
     } else {

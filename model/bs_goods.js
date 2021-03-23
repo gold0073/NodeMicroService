@@ -59,7 +59,7 @@ function register(method, pathname, params, cb) {
         connection.connect();
         connection.query("insert into goods(name, category, price, description) values(? ,? ,? ,?)"
             , [params.name, params.category, params.price, params.description]
-            , (error, results, fields) => {
+            , (error, results)=> {
             if (error) {
                 response.errorcode = 1;
                 response.errormessage = error;               
@@ -86,7 +86,7 @@ function inquiry(method, pathname, params, cb) {
 
     var connection = mysql.createConnection(conn);
     connection.connect();
-    connection.query("select * from  goods", (error, results, fields) => {
+    connection.query("select * from  goods", (error, results)=> {
         if (error || results.length == 0) {
             response.errorcode = 1;
             response.errormessage = error ? error : "no data";
@@ -122,7 +122,7 @@ function unregister(method, pathname, params, cb) {
         connection.connect();
         connection.query("delete from goods where id = ?"
             , [params.id]
-            , (error, results, fields) => {
+            , (error, results)=> {
                 if (error) {
                     response.errorcode = 1;
                     response.errormessage = error;

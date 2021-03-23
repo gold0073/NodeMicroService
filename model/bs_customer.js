@@ -41,7 +41,7 @@ function register(method, pathname, params, cb) {
 
     var connection = mysql.createConnection(conn);
     connection.connect();
-    connection.query("insert into customer(username, password) values('" + params.username + "',password('" + params.password + "'));", (error, results, fields) => {
+    connection.query("insert into customer(username, password) values('" + params.username + "',password('" + params.password + "'));", (error, results)=> {
         if (error) {
             response.errorcode = 1;
             response.errormessage = error;                
@@ -67,7 +67,7 @@ function register(method, pathname, params, cb) {
 
     let params = [image, name, birthday, gender, job];
     connection.query(sql, params,
-        (err, results, fields) => {
+        (err, results)=> {
             response.send(results);
         }
     )
@@ -92,7 +92,7 @@ function inquiry(method, pathname, params, cb) {
     };
     var connection = mysql.createConnection(conn);
     connection.connect();
-    connection.query("select * from  customer", (error, results, fields) => {
+    connection.query("select * from  customer", (error, results)=> {
         if (error || results.length == 0) {
             response.errorcode = 1;
             response.errormessage = error ? error : "no data";
@@ -125,7 +125,7 @@ function unregister(method, pathname, params, cb) {
     } else {
         var connection = mysql.createConnection(conn);
         connection.connect();
-        connection.query("delete from  customer where username = '" + params.username + "';", (error, results, fields) => {
+        connection.query("delete from  customer where username = '" + params.username + "';", (error, results)=> {
             if (error) {
                 response.errorcode = 1;
                 response.errormessage = error;                

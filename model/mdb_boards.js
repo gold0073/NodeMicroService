@@ -74,7 +74,7 @@ function fn_content_create(method, pathname, params, cb) {
         console.log("Query ==>" , squery);
 
         connection.query(squery , [params.user_id, params.title, params.context]
-        , (error, results, fields) => {
+        , (error, results)=> {
         if (error) {
             response.errorcode = 1;
             response.errormessage = error;               
@@ -116,7 +116,7 @@ function fn_content_update(method, pathname, params, cb) {
          console.log("Query ==>" , squery);
 
          connection.query(squery , [params.title, params.context, params.content_id]
-         , (error, results, fields) => {
+         , (error, results)=> {
          if (error) {
              response.errorcode = 1;
              response.errormessage = error;               
@@ -158,7 +158,7 @@ function fn_content_inquiry(method, pathname, params, cb) {
         `;
         console.log("Query ==>",squery);
 
-        connection.query(squery, (error, results, fields) => {
+        connection.query(squery, (error, results)=> {
             if (error || results.length == 0) {
                 response.errorcode = 1;
                 response.errormessage = error ? error : "no data";
@@ -174,7 +174,7 @@ function fn_content_inquiry(method, pathname, params, cb) {
         WHERE CT.content_id = ?`;
         console.log("Query ==>",squery);
 
-        connection.query(squery,[params.content_id] ,(error, results, fields) => {
+        connection.query(squery,[params.content_id] ,(error, results)=> {
             if (error || results.length == 0) {
                 response.errorcode = 1;
                 response.errormessage = error ? error : "no data";
@@ -216,7 +216,7 @@ function fn_content_delete(method, pathname, params, cb) {
 
         connection.query(squery
             , [params.content_id]
-            , (error, results, fields) => {
+            , (error, results)=> {
                 if (error) {
                     response.errorcode = 1;
                     response.errormessage = error;

@@ -45,7 +45,7 @@ function register(method, pathname, params, cb) {
         connection.connect();
         connection.query("insert into purchases(userid, goodsid) values(? ,? )"
             , [params.userid, params.goodsid]
-            , (error, results, fields) => {
+            , (error, results)=> {
                 if (error) {
                     response.errorcode = 1;
                     response.errormessage = error;                    
@@ -79,7 +79,7 @@ function inquiry(method, pathname, params, cb) {
         connection.connect();
         connection.query("select id, goodsid, date from purchases where userid = ?"
             , [params.userid]
-            , (error, results, fields) => {
+            , (error, results)=> {
                 if (error) {
                     response.errorcode = 1;
                     response.errormessage = error;
