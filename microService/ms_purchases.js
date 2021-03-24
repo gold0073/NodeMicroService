@@ -1,13 +1,13 @@
 
 'use strict';
 
-const serverjs = require('../server.js');
+const tcpServer = require('../tcpServer.js');
 
 // 비즈니스로직 파일 참조
 const business = require('../model/bs_purchases.js');
 
 // Server클래스 참조
-class purchases extends serverjs {
+class purchases extends tcpServer {
     constructor() {
         super("purchases"                                                   // 부모 클래스 생성자 호출
             , process.argv[2] ? Number(process.argv[2]) : 9030

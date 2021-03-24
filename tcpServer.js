@@ -1,7 +1,7 @@
 
 'use strict';
 const net = require('net');
-const tcpClient = require('./client.js');
+const tcpClient = require('./tcpClient.js');
 
 /*
 * 서버 클래스

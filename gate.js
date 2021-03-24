@@ -4,7 +4,7 @@ const express = require('express');
 const http = require('http');
 const url = require('url');
 const querystring = require('querystring');
-const tcpClient = require('./client');
+const tcpClient = require('./tcpClient');
 const cors = require("cors");
 
 var mapClients = {};

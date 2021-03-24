@@ -1,9 +1,9 @@
 'use strict'
 
 const business = require('../model/bs_goods');
-const serverjs = require('../server.js');
+const tcpServer = require('../tcpServer.js');
 
-class goods extends serverjs{
+class goods extends tcpServer{
     constructor() {
         super("goods"                                                   // 부모 클래스 생성자 호출
             , process.argv[2] ? Number(process.argv[2]) : 9010

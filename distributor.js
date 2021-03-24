@@ -7,9 +7,9 @@
 var map = {};
 
 // Server 클래스 상속
-class distributor extends require('./server.js') {
+class distributor extends require('./tcpServer.js') {
     constructor() {
-        super("distributor", 9000, ["POST/distributes", "GET/distributes"]);
+        super("distributor", 9000, ["POST/distributes", "GET/distributes", "PUT/distributes", "DELETE/distributes"]);
     }
 
     // 노드 접속 이벤트 처리

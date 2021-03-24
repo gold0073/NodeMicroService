@@ -1,13 +1,13 @@
 
 'use strict';
 
-const serverjs = require('../server.js');
+const tcpServer = require('../tcpServer.js');
 
 // 비즈니스로직 파일 참조
 const business = require('../model/mdb_boards.js');
 
 // Server클래스 참조
-class mariaDb_boards extends serverjs{
+class mariaDb_boards extends tcpServer{
     constructor() {
         
         super("mariaDb_boards"                                                     // 부cd..모 클래스 생성자 호출
