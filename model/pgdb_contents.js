@@ -1,13 +1,7 @@
 
 /*   PostgresDB  */
-const {Pool} = require('pg');
-const pool =new Pool({
-    host: 'localhost',
-    user: 'postgres',
-    password: 'park0070!',
-    database: 'monolithic',
-    port : '5432'
-});
+const configjs = require("../config.js")
+const pool = configjs.postgre_pool;
 
 /**
  * Content 기능별로 분기

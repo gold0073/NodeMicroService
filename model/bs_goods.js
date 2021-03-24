@@ -1,24 +1,9 @@
 
 
-/*   PostgresDB */
-const mysql = require('pg');
-const conn = {
-    host: 'localhost',
-    user: 'postgres',
-    password: 'park0070!',
-    database: 'monolithic',
-    port : '5432'
-};
-
-/*   MariaDB
+/*   MariaDB */
 const mysql = require('mysql');
-const conn = {
-    host: 'localhost',
-    user: 'micro',
-    password: 'service',
-    database: 'monolithic'
-};
-*/
+const conn = require("../config.js").maria_conn;
+
 /**
  * 상품 관리의 각 기능별로 분기
 */

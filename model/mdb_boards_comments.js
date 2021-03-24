@@ -2,12 +2,7 @@
 
 /*   MariaDB */
 const mysql = require('mysql');
-const conn = {
-    host: 'localhost',
-    user: 'micro',
-    password: 'service',
-    database: 'monolithic'
-};
+const conn = require("../config.js").maria_conn;
 
 /**
  * Comment 기능별로 분기
