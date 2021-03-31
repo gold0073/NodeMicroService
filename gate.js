@@ -50,7 +50,7 @@ var server = http.createServer((req, res) => {
     } else {
         onRequest(res, method, pathname, uri.query);
     }
-}).listen(8000, () => {
+}).listen(8800, () => {
     console.log('listen', server.address());
 
     // Distributor와 의 통신 처리
@@ -59,7 +59,7 @@ var server = http.createServer((req, res) => {
         method: "POST",
         key: 0,
         params: {
-            port: 8000,
+            port: 8800,
             name: "gate",
             urls: []
         }
